@@ -1,0 +1,26 @@
+.markdownBody {
+  font-size: 1.1rem;
+  line-height: 3.1;
+}
+
+.markdownParagraph {
+  margin-bottom: 1.5em;
+}
+
+.markdownBody h2 {
+  font-size: 1.5rem;
+  margin-top: 3.5em;
+  margin-bottom: 0.75em;
+}
+
+@media (max-width: 767px) {
+  .markdownBody {
+    font-size: 1rem;
+    line-height: 3.1;
+  }
+
+  .markdownBody h2 {
+    font-size: 1.25rem;
+    margin-top: 2em;
+  }
+}
