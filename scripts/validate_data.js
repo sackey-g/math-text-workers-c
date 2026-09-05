@@ -12,7 +12,9 @@ function report(file, lineNumber, message) {
 }
 
 function validateMath(math, file, lineNumber, isInline) {
-  if (/\\frac\b/.test(math)) {
+  // 指数の肩にある \frac は許容（文字バランスのため: e^{\frac{x}{2}} など）
+  const mathForFrac = math.replace(/\^\{\\frac\{[^{}]*\}\{[^{}]*\}\}/g, "");
+  if (/\\frac\b/.test(mathForFrac)) {
     report(file, lineNumber, "分数には \\dfrac を使用してください");
   }
   if (/\\(?:leq|le|geq|ge)(?![A-Za-z])/.test(math)) {
@@ -21,7 +23,9 @@ function validateMath(math, file, lineNumber, isInline) {
   if (/, +(?!\\)/.test(math)) {
     report(file, lineNumber, "数式内のカンマの後は \\ で空けてください");
   }
-  if (/[．，。]/.test(math)) {
+  // \text{...} 内の日本語句読点は許容
+  const mathForPunct = math.replace(/\\text\{[^{}]*\}/g, "");
+  if (/[．，。]/.test(mathForPunct)) {
     report(file, lineNumber, "句読点は数式の外に配置してください");
   }
   if (isInline && /\\(?:sum|lim)(?![A-Za-z]|\\limits)/.test(math)) {
@@ -30,7 +34,9 @@ function validateMath(math, file, lineNumber, isInline) {
   if (isInline && /(?<!\\displaystyle)\\int/.test(math)) {
     report(file, lineNumber, "インラインの積分記号には \\displaystyle を付けてください");
   }
-  if (/(?<!\\,)(?:dx|dt|du|dv|dy|dz|dr|d\\theta|d\\phi)(?=(?:\s|$|[,)}\]<>=]))/.test(math)) {
+  // 微分商（\dfrac{dx}{dt} など）を除外して微小量を検査
+  const mathForDiff = math.replace(/\\(?:d)?frac\{d\^?[0-9]?[a-z]\}\{d[a-z]\^?[0-9]?\}/g, "");
+  if (/(?<!\\,)(?:dx|dt|du|dv|dy|dz|dr|d\\theta|d\\phi)(?=(?:\s|$|[,)}\]<>=]))/.test(mathForDiff)) {
     report(file, lineNumber, "積分の微小量の前には \\, を付けてください");
   }
 }
